@@ -1,0 +1,11 @@
+O3_HOST=test_host
+O3_PORT=4655
+O3_USER=user
+O3_PASSWORD=password
+
+MONGO_HOST=test_host_mongo
+MONGO_PORT=port_mongo
+MONGO_USER=user_mongo
+MONGO_PASSWORD=password_mongo
+
+BASE_PASSWORD_PATIENT=base_password

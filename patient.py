@@ -1,7 +1,17 @@
 import requests
-from os import environ
+from os import getenv
 from pymongo import MongoClient
 import bcrypt
+
+environ = {
+    "O3_HOST": getenv("O3_HOST", "localhost"),
+    "O3_PORT": getenv("O3_PORT", "8080"),
+    "O3_USER": getenv("O3_USER", "user"),
+    "O3_PASSWORD": getenv("O3_PASSWORD", "example"),
+    "MONGO_HOST": getenv("MONGO_HOST", "localhost"),
+    "MONGO_PORT": getenv("MONGO_PORT", "27017"),
+    "BASE_PASSWORD_PATIENT": getenv("BASE_PASSWORD_PATIENT", "123456"),
+}
 
 # Fonction pour récupérer les patients depuis OpenMRS
 def get_patients(search: str):

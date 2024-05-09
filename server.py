@@ -1,14 +1,13 @@
+from datetime import datetime
 import time
 import urllib.parse
-from dotenv import load_dotenv
 
 # import random
 import itertools
+from patient import get_patients, insert_patients, get_mongodb_client
 
-from patient import get_patients, insert_patients
-
-
-# Générer toutes les combinaisons possibles de deux caractères
+print(f" [{datetime.now()}] init")
+# generate all base search text
 tableau = [
     "a",
     "b",
@@ -39,30 +38,30 @@ tableau = [
 ]
 combinaisons = ["".join(paire) for paire in itertools.permutations(tableau, 2)]
 
-# Mélanger aléatoirement les combinaisons
+# shuffle randomly the combinations
 # random.shuffle(combinaisons)
-
+# time to sleep
 waiting_time = 10
 
-# chargement des variables d'environnements
-load_dotenv()
-
-# Boucle d'écoute des changements
+# loop of the server
 while True:
-    patients = []
-    for i in range(len(combinaisons)):
-        # Terme de recherche
-        recherche = combinaisons[i]
+    print(f" [{datetime.now()}] start synchronisation")
+    
+    # connection to mongo
+    client = get_mongodb_client()
 
-        # Encodage du terme de recherche
+    for recherche in combinaisons:
+        # Encod search text
         encoded_term = urllib.parse.quote(recherche, safe="")
 
-        patients.extend(get_patients(encoded_term))
+        # get patients
+        patients = get_patients(encoded_term)
 
-    # insertion et actualisation des données dans la BD des patients
-    insert_patients(patients)
+        # insert and update patients
+        insert_patients(patients, client)
 
-    print("Synchronisation des patients terminée avec succès.")
+    client.close()
+    print(f" [{datetime.now()}] end synchronisation")
 
-    # Attendre un temps avant de relancer
+    # waiting
     time.sleep(waiting_time)

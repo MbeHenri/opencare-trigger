@@ -2,6 +2,12 @@ import requests
 from os import getenv
 from pymongo import MongoClient
 import bcrypt
+from dotenv import load_dotenv
+from datetime import datetime
+
+# chargement des variables d'environnements
+load_dotenv()
+
 
 environ = {
     "O3_HOST": getenv("O3_HOST", "localhost"),
@@ -11,7 +17,10 @@ environ = {
     "MONGO_HOST": getenv("MONGO_HOST", "localhost"),
     "MONGO_PORT": getenv("MONGO_PORT", "27017"),
     "BASE_PASSWORD_PATIENT": getenv("BASE_PASSWORD_PATIENT", "123456"),
+    "MONGO_USER": getenv("MONGO_USER", "user"),
+    "MONGO_PASSWORD": getenv("MONGO_PASSWORD", "example"),
 }
+
 
 # Fonction pour récupérer les patients depuis OpenMRS
 def get_patients(search: str):
@@ -29,38 +38,25 @@ def get_patients(search: str):
     # url = f'http://your-openmrs-url/ws/rest/v1/patient?q={encoded_term}'
 
     response = requests.get(
-        f'{openmrs_url}/ws/rest/v1/patient?q={search}&v=full&limit=1"',
+        f"{openmrs_url}/ws/rest/v1/patient?q={search}&v=custom:(uuid,patientIdentifier:(identifier),person:(display))",
         auth=(openmrs_username, openmrs_password),
     )
     response.raise_for_status()
     return response.json()["results"]
 
+
 # insertion des patients dans la base de données du portail des patients
-def insert_patients(patients):
-
+def insert_patients(patients, client: MongoClient):
     # initialisation
-    host = environ["MONGO_HOST"]
-    port = environ["MONGO_PORT"]
-
-    if port == "":
-        mongo_url = f"mongodb://{host}/"
-    else:
-        mongo_url = f"mongodb://{host}:{port}/"
-
-    password = environ["BASE_PASSWORD_PATIENT"]
-    mongo_database = "opencare"
-    mongo_collection = "patients"
-
-    # connexion à mongoDB
-    client = MongoClient(mongo_url)
-    db = client[mongo_database]
-    collection = db[mongo_collection]
+    db = client["opencare"]
+    collection = db["patients"]
 
     # Hashage du mot de passe
+    password = environ["BASE_PASSWORD_PATIENT"]
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
     for patient in patients:
-        patient["username"] = patient["identifiers"][0]["identifier"]
+        patient["username"] = patient["patientIdentifier"]["identifier"]
         patient["password"] = hashed_password
         # Utilisation de l'identifiant du patient comme filtre
         filter_query = {"uuid": patient["uuid"]}
@@ -68,5 +64,21 @@ def insert_patients(patients):
         update_query = {"$set": patient}
         # Utilisation de 'upsert=True' pour insérer ou mettre à jour le document
         collection.update_one(filter_query, update_query, upsert=True)
+        print(f" [{datetime.now()}] sync Identifier({patient['username']})")
 
-    client.close()
+
+def get_mongodb_client():
+    host = environ["MONGO_HOST"]
+    port = environ["MONGO_PORT"]
+    user = environ["MONGO_USER"]
+    password = environ["MONGO_PASSWORD"]
+
+    if port == "":
+        mongo_url = f"mongodb://{user}:{password}@{host}/"
+    else:
+        mongo_url = f"mongodb://{user}:{password}@{host}:{port}/"
+
+    # connexion à mongoDB
+    client = MongoClient(mongo_url)
+
+    return client

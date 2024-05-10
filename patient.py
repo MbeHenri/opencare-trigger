@@ -27,7 +27,7 @@ def get_patients(search: str):
     # initialisation
     host = environ["O3_HOST"]
     port = environ["O3_PORT"]
-    if port == "":
+    if port:
         openmrs_url = f"http://{host}/openmrs"
     else:
         openmrs_url = f"http://{host}:{port}/openmrs"

@@ -11,14 +11,14 @@ load_dotenv()
 
 environ = {
     "O3_HOST": getenv("O3_HOST", "localhost"),
-    "O3_PORT": getenv("O3_PORT", "8080"),
+    "O3_PORT": getenv("O3_PORT"),
     "O3_USER": getenv("O3_USER", "user"),
     "O3_PASSWORD": getenv("O3_PASSWORD", "example"),
     "MONGO_HOST": getenv("MONGO_HOST", "localhost"),
     "MONGO_PORT": getenv("MONGO_PORT", "27017"),
     "BASE_PASSWORD_PATIENT": getenv("BASE_PASSWORD_PATIENT", "123456"),
-    "MONGO_USER": getenv("MONGO_USER", "user"),
-    "MONGO_PASSWORD": getenv("MONGO_PASSWORD", "example"),
+    "MONGO_USER": getenv("MONGO_USER"),
+    "MONGO_PASSWORD": getenv("MONGO_PASSWORD"),
 }
 
 
@@ -72,11 +72,9 @@ def get_mongodb_client():
     port = environ["MONGO_PORT"]
     user = environ["MONGO_USER"]
     password = environ["MONGO_PASSWORD"]
-
-    if port == "":
-        mongo_url = f"mongodb://{user}:{password}@{host}/"
-    else:
-        mongo_url = f"mongodb://{user}:{password}@{host}:{port}/"
+    
+    auth_str = user and password if  f"{user}:{password}@" else ""
+    mongo_url = f"mongodb://{auth_str}{host}:{port}/"
 
     # connexion à mongoDB
     client = MongoClient(mongo_url)

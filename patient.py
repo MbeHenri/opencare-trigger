@@ -28,9 +28,13 @@ def get_patients(search: str):
     host = environ["O3_HOST"]
     port = environ["O3_PORT"]
     if port:
-        openmrs_url = f"http://{host}/openmrs"
-    else:
         openmrs_url = f"http://{host}:{port}/openmrs"
+    else:
+        openmrs_url = f"http://{host}/openmrs"
+
+    print("**********************************************")
+    print(openmrs_url)
+
     openmrs_username = environ["O3_USER"]
     openmrs_password = environ["O3_PASSWORD"]
 
@@ -72,8 +76,8 @@ def get_mongodb_client():
     port = environ["MONGO_PORT"]
     user = environ["MONGO_USER"]
     password = environ["MONGO_PASSWORD"]
-    
-    auth_str = user and password if  f"{user}:{password}@" else ""
+
+    auth_str = f"{user}:{password}@" if user and password else ""
     mongo_url = f"mongodb://{auth_str}{host}:{port}/"
 
     # connexion à mongoDB

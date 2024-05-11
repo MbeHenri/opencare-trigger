@@ -10,11 +10,11 @@ load_dotenv()
 
 
 environ = {
-    "O3_HOST": getenv("O3_HOST", "localhost"),
-    "O3_PORT": getenv("O3_PORT"),
-    "O3_USER": getenv("O3_USER", "user"),
-    "O3_PASSWORD": getenv("O3_PASSWORD", "example"),
-    "MONGO_HOST": getenv("MONGO_HOST", "localhost"),
+    "O3_HOST": getenv("O3_HOST"),
+    "O3_PORT": getenv("O3_PORT", "80"),
+    "O3_USER": getenv("O3_USER"),
+    "O3_PASSWORD": getenv("O3_PASSWORD"),
+    "MONGO_HOST": getenv("MONGO_HOST"),
     "MONGO_PORT": getenv("MONGO_PORT", "27017"),
     "BASE_PASSWORD_PATIENT": getenv("BASE_PASSWORD_PATIENT", "123456"),
     "MONGO_USER": getenv("MONGO_USER"),

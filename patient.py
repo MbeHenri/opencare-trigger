@@ -32,9 +32,6 @@ def get_patients(search: str):
     else:
         openmrs_url = f"http://{host}/openmrs"
 
-    print("**********************************************")
-    print(openmrs_url)
-
     openmrs_username = environ["O3_USER"]
     openmrs_password = environ["O3_PASSWORD"]
 

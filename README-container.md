@@ -6,6 +6,12 @@
 docker build -t opencare-trigger .
 ```
 
+## run
+
+```sh
+docker run --env-file ./example.env opencare-trigger [--network <network_name>]
+```
+
 ## Environment Variables
 
 * `O3_HOST` - o3 hostname (localhost)

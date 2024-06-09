@@ -1,6 +1,7 @@
 from os import getenv
 from dotenv import load_dotenv
 from pymongo import MongoClient
+import xmlrpc.client
 
 # chargement des variables d'environnements
 load_dotenv()
@@ -16,7 +17,15 @@ environ = {
     "BASE_PASSWORD_PATIENT": getenv("BASE_PASSWORD_PATIENT", "123456"),
     "MONGO_USER": getenv("MONGO_USER"),
     "MONGO_PASSWORD": getenv("MONGO_PASSWORD"),
+    "ODOO_HOST": getenv("ODOO_HOST"),
+    "ODOO_PORT": getenv("ODOO_PORT"),
+    "ODOO_USER": getenv("ODOO_USER"),
+    "ODOO_DB": getenv("ODOO_DB"),
+    "ODOO_PASSWORD": getenv("ODOO_API_KEY"),
+    "ODOO_CODE_SERVICE": getenv("ODOO_CODE_SERVICE", "OPENCARES"),
+    "ODOO_PRICE_SERVICE": getenv("ODOO_PRICE_SERVICE", 1500),
 }
+
 
 def get_mongodb_client():
     host = environ["MONGO_HOST"]
@@ -31,3 +40,24 @@ def get_mongodb_client():
     client = MongoClient(mongo_url)
 
     return client
+
+
+def get_odoo_client():
+    # Odoo API endpoint URLs
+    host = environ["ODOO_HOST"]
+    port = environ["ODOO_PORT"]
+    if port:
+        ODOO_URL = f"http://{host}:{port}"
+    else:
+        ODOO_URL = f"http://{host}"
+
+    ODOO_DB = environ["ODOO_DB"]
+    ODOO_USERNAME = environ["ODOO_USER"]
+    ODOO_PASSWORD = environ["ODOO_PASSWORD"]
+
+    # Connect to Odoo API
+    common = xmlrpc.client.ServerProxy("{}/xmlrpc/2/common".format(ODOO_URL))
+    uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
+    models = xmlrpc.client.ServerProxy("{}/xmlrpc/2/object".format(ODOO_URL))
+
+    return models, uid

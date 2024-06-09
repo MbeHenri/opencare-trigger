@@ -4,9 +4,9 @@ import urllib.parse
 
 # import random
 import itertools
-from .utils import get_patients, insert_patients
+from .utils import get_patients, insert_patients, insert_patients_odoo
 
-from triggers.config import get_mongodb_client
+from triggers.config import get_mongodb_client, get_odoo_client
 
 
 def main():
@@ -48,11 +48,15 @@ def main():
     waiting_time = 10
 
     # loop of the server
+
+    # connection to mongo
+    client = get_mongodb_client()
+
+    # connection to odoo
+    models, uid = get_odoo_client()
+
     while True:
         print(f"[Patient] [{datetime.now()}] start synchronisation")
-
-        # connection to mongo
-        client = get_mongodb_client()
 
         for recherche in combinaisons:
             # Encod search text
@@ -63,6 +67,9 @@ def main():
 
             # insert and update patients
             insert_patients(patients, client)
+
+            # insert patients as customers
+            insert_patients_odoo(patients, models, uid)
 
         client.close()
         print(f"[Patient] [{datetime.now()}] end synchronisation")

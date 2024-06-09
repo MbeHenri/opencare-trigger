@@ -48,4 +48,45 @@ def insert_patients(patients, client: MongoClient):
         update_query = {"$set": patient}
         # Utilisation de 'upsert=True' pour insérer ou mettre à jour le document
         collection.update_one(filter_query, update_query, upsert=True)
-        print(f"[Patient] [{datetime.now()}] sync Identifier({patient['username']})")
+        print(
+            f"[Patient] [patient] [{datetime.now()}] sync Identifier({patient['username']})"
+        )
+
+
+def insert_patients_odoo(patients, models, uid):
+    for patient in patients:
+        name = "{}".format(patient["person"]["display"])
+        email = "{}@opencare.com".format(".".join(name.split(sep=" ")))
+
+        # Search for the customer by email
+        customer_id = models.execute_kw(
+            environ["ODOO_DB"],
+            uid,
+            environ["ODOO_PASSWORD"],
+            "res.partner",
+            "search",
+            [[["email", "=", email]]],
+        )
+
+        if customer_id:
+            print(
+                f"[Patient] [odoo] [{datetime.now()}] sync Identifier({patient['username']}) exist"
+            )
+        else:
+            customer_id = models.execute_kw(
+                environ["ODOO_DB"],
+                uid,
+                environ["ODOO_PASSWORD"],
+                "res.partner",
+                "create",
+                [
+                    {
+                        "name": name,
+                        "email": email,
+                        "customer_rank": 1,
+                    }
+                ],
+            )
+            print(
+                f"[Patient] [odoo] [{datetime.now()}] sync Identifier({patient['username']}) created"
+            )

@@ -71,7 +71,7 @@ def main():
             # insert patients as customers
             insert_patients_odoo(patients, models, uid)
 
-        client.close()
+        # client.close()
         print(f"[Patient] [{datetime.now()}] end synchronisation")
 
         # waiting

@@ -56,8 +56,9 @@ def insert_patients(patients, client: MongoClient):
 def insert_patients_odoo(patients, models, uid):
     for patient in patients:
         name = "{}".format(patient["person"]["display"])
+        code = "{}".format(patient["patientIdentifier"]["identifier"])
         email = "{}@opencare.com".format(patient["patientIdentifier"]["identifier"])
-        uuid = patient["uuid"]
+
         # Search for the customer by email
         customer_id = models.execute_kw(
             environ["ODOO_DB"],
@@ -65,7 +66,7 @@ def insert_patients_odoo(patients, models, uid):
             environ["ODOO_PASSWORD"],
             "res.partner",
             "search",
-            [[["ref", "=", uuid]]],
+            [[["ref", "=", code]]],
         )
 
         if customer_id:
@@ -83,7 +84,7 @@ def insert_patients_odoo(patients, models, uid):
                     {
                         "name": name,
                         "email": email,
-                        "ref": uuid,
+                        "ref": code,
                         "customer_rank": 1,
                     }
                 ],

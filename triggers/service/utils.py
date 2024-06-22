@@ -1,4 +1,4 @@
-# import requests
+import requests
 from datetime import datetime
 from triggers.config import environ
 
@@ -6,7 +6,7 @@ from triggers.config import environ
 # Fonction pour récupérer les services depuis OpenMRS
 def get_services():
     # initialisation
-    """host = environ["O3_HOST"]
+    host = environ["O3_HOST"]
     port = environ["O3_PORT"]
     if port:
         openmrs_url = f"http://{host}:{port}/openmrs"
@@ -17,16 +17,14 @@ def get_services():
     openmrs_password = environ["O3_PASSWORD"]
 
     response = requests.get(
-        f"{openmrs_url}/ws/rest/v1/patient?q={search}&v=custom:(uuid,patientIdentifier:(identifier),person:(display))",
+        f"{openmrs_url}/ws/rest/v1/appointmentService/all/full",
         auth=(openmrs_username, openmrs_password),
     )
-    response.raise_for_status()"""
+    response.raise_for_status()
+
     return [
-        {"name": "Pédiatrie", "uuid": "7ba3aa21-cc56-47ca-bb4d-a60549f666c0"},
-        {"name": "Ophtalmologie", "uuid": "8a46c3db-bbb2-4eaf-b87e-1e7385317513"},
-        {"name": "Dentiste", "uuid": "136b3011-ccf2-416f-8c3d-5b878e2624bb"},
-        {"name": "Chirurgie", "uuid": "3e00d85d-a118-414d-a7fe-5e8d6f164482"},
-        {"name": "Généraliste", "uuid": "475a8d54-02ef-4925-857a-2423f0e926d8"},
+        {"name": service["name"], "uuid": service["uuid"]}
+        for service in response.json()
     ]
 
 

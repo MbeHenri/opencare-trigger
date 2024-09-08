@@ -6,18 +6,12 @@ from triggers.config import environ
 # Fonction pour récupérer les services depuis OpenMRS
 def get_services():
     # initialisation
-    host = environ["O3_HOST"]
-    port = environ["O3_PORT"]
-    if port:
-        openmrs_url = f"http://{host}:{port}/openmrs"
-    else:
-        openmrs_url = f"http://{host}/openmrs"
-
+    openmrs_url = environ["O3_URL"]
     openmrs_username = environ["O3_USER"]
     openmrs_password = environ["O3_PASSWORD"]
 
     response = requests.get(
-        f"{openmrs_url}/ws/rest/v1/appointmentService/all/full",
+        f"{openmrs_url}/openmrs/ws/rest/v1/appointmentService/all/full",
         auth=(openmrs_username, openmrs_password),
     )
     response.raise_for_status()

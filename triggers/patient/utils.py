@@ -8,21 +8,15 @@ from triggers.config import environ
 # Fonction pour récupérer les patients depuis OpenMRS
 def get_patients(search: str):
     # initialisation
-    host = environ["O3_HOST"]
-    port = environ["O3_PORT"]
-    if port:
-        openmrs_url = f"http://{host}:{port}/openmrs"
-    else:
-        openmrs_url = f"http://{host}/openmrs"
-
+    openmrs_url = environ["O3_URL"]
     openmrs_username = environ["O3_USER"]
     openmrs_password = environ["O3_PASSWORD"]
-
+    
     # Construction de l'URL
     # url = f'http://your-openmrs-url/ws/rest/v1/patient?q={encoded_term}'
 
     response = requests.get(
-        f"{openmrs_url}/ws/rest/v1/patient?q={search}&v=custom:(uuid,patientIdentifier:(identifier),person:(display))",
+        f"{openmrs_url}/openmrs/ws/rest/v1/patient?q={search}&v=custom:(uuid,patientIdentifier:(identifier),person:(display))",
         auth=(openmrs_username, openmrs_password),
     )
     response.raise_for_status()

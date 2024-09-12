@@ -26,14 +26,14 @@ def insert_doctors_to_talk(doctors):
     user = environ["TALK_USER"]
     password = environ["TALK_PASSWORD"]
     talk_base_pwd = environ["TALK_INIT_PASSWORD"]
-    
+
     TALK_BASE64 = base64.b64encode(f"{user}:{password}".encode("utf-8")).decode("utf-8")
 
     headers = {
         "Accept": "application/json",
         "OCS-APIRequest": "true",
         "Content-Type": "application/json",
-        'Authorization': f'Basic {TALK_BASE64}',
+        "Authorization": f"Basic {TALK_BASE64}",
     }
 
     for doctor in doctors:
@@ -50,8 +50,8 @@ def insert_doctors_to_talk(doctors):
             headers=headers,
             json=payload,
         )
-        
-        print(response.text)
+
+        # print(response.text)
 
         if response.status_code == 400 or response.ok:
             if response.status_code == 400:

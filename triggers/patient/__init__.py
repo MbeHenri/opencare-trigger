@@ -8,39 +8,40 @@ from .utils import get_patients, insert_patients, insert_patients_odoo
 
 from triggers.config import get_mongodb_client, get_odoo_client
 
+# generate all base search text
+tableau = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+]
+combinaisons = ["".join(paire) for paire in itertools.permutations(tableau, 2)]
+
 
 def main():
     print(f"[Patient] [{datetime.now()}] init")
-    # generate all base search text
-    tableau = [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f",
-        "g",
-        "h",
-        "i",
-        "j",
-        "k",
-        "l",
-        "m",
-        "n",
-        "o",
-        "p",
-        "q",
-        "r",
-        "s",
-        "t",
-        "u",
-        "v",
-        "w",
-        "x",
-        "y",
-        "z",
-    ]
-    combinaisons = ["".join(paire) for paire in itertools.permutations(tableau, 2)]
 
     # shuffle randomly the combinations
     # random.shuffle(combinaisons)

@@ -6,9 +6,7 @@ from triggers.config import get_mongodb_client
 from triggers.doctor.utils import get_doctors
 from triggers.patient import combinaisons
 from triggers.patient.utils import get_patients
-from triggers.room.utils import create_room, insert_user_to_talk
-
-# import random
+from triggers.room.utils import create_room, insert_user_to_talk, add_user_room
 
 
 def main():
@@ -23,7 +21,7 @@ def main():
     collection = db["rooms"]
 
     while True:
-        print(f"[ROOM] [{datetime.now()}] start synchronisation")
+        print(f"[Room] [{datetime.now()}] start synchronisation")
 
         # get doctors
         doctors = get_doctors()
@@ -53,12 +51,16 @@ def main():
                         }
                     )
                     # si non on la crée dans talk et on la renseigne dans mongo
-                    if not exist:
+                    if exist is None:
                         token = create_room(
                             f"Consultation ({doctor['person']['display']} / {patient['person']['display']})"
                         )
 
-                        if token:
+                        if token is not None:
+                            add_user_room(
+                                token, patient["patientIdentifier"]["identifier"]
+                            )
+                            add_user_room(token, doctor["identifier"])
                             collection.insert_one(
                                 {
                                     "uuidPatient": patient["uuid"],
@@ -66,9 +68,10 @@ def main():
                                     "tokenRoom": token,
                                 }
                             )
-                            print(
-                                f"[Room] [mongo] [{datetime.now()}] insert ({token}) error"
-                            )
+                    else:
+                        print(
+                            f"[Room] [talk] [{datetime.now()}] create {exist['tokenRoom']} error"
+                        )
 
         # client.close()
         print(f"[Room] [{datetime.now()}] end synchronisation")

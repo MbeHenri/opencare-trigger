@@ -60,11 +60,11 @@ def insert_doctors_to_talk(doctors):
 
                 if status != 102:
                     print(
-                        f"[Doctor] [doctor] [{datetime.now()}] sync Identifier({username}) exist"
+                        f"[Doctor] [doctor] [{datetime.now()}] sync Identifier({username}) error"
                     )
                 else:
                     print(
-                        f"[Doctor] [doctor] [{datetime.now()}] sync Identifier({username}) error"
+                        f"[Doctor] [doctor] [{datetime.now()}] sync Identifier({username}) exist"
                     )
             else:
                 print(

@@ -1,8 +1,9 @@
+from threading import Thread
 from triggers.patient import main as trigger_patient
 from triggers.service import main as trigger_service
-from triggers.doctor import main as trigger_doctor
 from triggers.room import main as trigger_room
-from threading import Thread
+
+# from triggers.doctor import main as trigger_doctor
 
 threads = [
     # trigger des patients
@@ -10,7 +11,7 @@ threads = [
     # trigger des services
     Thread(target=trigger_service),
     # trigger des docteurs (providers)
-    Thread(target=trigger_doctor),
+    # Thread(target=trigger_doctor),
     # trigger pour les rooms
     Thread(target=trigger_room),
 ]

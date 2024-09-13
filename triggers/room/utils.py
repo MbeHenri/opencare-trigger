@@ -33,8 +33,8 @@ def insert_user_to_talk(username, display):
         json=payload,
     )
 
-    # print(response.text)
-
+    # print(response.text
+    # print(f"{response.text}")
     if response.status_code == 400 or response.ok:
         if response.status_code == 400:
             data = response.json()
@@ -42,11 +42,11 @@ def insert_user_to_talk(username, display):
 
             if status != 102:
                 print(
-                    f"[Room] [user] [{datetime.now()}] sync Identifier({username}) exist"
+                    f"[Room] [user] [{datetime.now()}] sync Identifier({username}) error"
                 )
             else:
                 print(
-                    f"[Room] [user] [{datetime.now()}] sync Identifier({username}) error"
+                    f"[Room] [user] [{datetime.now()}] sync Identifier({username}) exist"
                 )
         else:
             print(
@@ -61,28 +61,45 @@ def create_room(name):
     talk_url = environ["TALK_URL"]
     user = environ["TALK_USER"]
     password = environ["TALK_PASSWORD"]
+    payload = {"roomType": "2", "roomName": f"{name}"}
 
     TALK_BASE64 = base64.b64encode(f"{user}:{password}".encode("utf-8")).decode("utf-8")
-
     headers = {
-        "Accept": "application/json",
         "OCS-APIRequest": "true",
-        "Content-Type": "application/json",
+        "Accept": "application/json",
         "Authorization": f"Basic {TALK_BASE64}",
     }
+    url = f"{talk_url}/ocs/v2.php/apps/spreed/api/v4/room"
+    response = requests.request("POST", url, headers=headers, data=payload, files=[])
 
-    data = {"roomType": "2", "roomName": name}
-
-    response = requests.post(
-        f"{talk_url}/ocs/v2.php/apps/spreed/api/v4/room", headers=headers, data=data
-    )
-
-    if response.status_code == 200:
+    if response.ok:
         result = response.json()
         data = result["ocs"]["data"]
         token = f'{data["token"]}'
-        print(f"[Room] [talk] [{datetime.now()}] create ({token}) ok")
+        print(f"[Room] [talk] [{datetime.now()}] create {name} ({token}) ok")
         return token
     else:
-        print(f"[Room] [talk] [{datetime.now()}] create ({token}) error")
+        print(f"[Room] [talk] [{datetime.now()}] create {name} error")
         return None
+
+
+def add_user_room(token, username):
+    # initialisation
+    talk_url = environ["TALK_URL"]
+    user = environ["TALK_USER"]
+    password = environ["TALK_PASSWORD"]
+    payload = {"newParticipant": f"{username}"}
+    TALK_BASE64 = base64.b64encode(f"{user}:{password}".encode("utf-8")).decode("utf-8")
+    headers = {
+        "OCS-APIRequest": "true",
+        "Accept": "application/json",
+        "Authorization": f"Basic {TALK_BASE64}",
+    }
+
+    url = f"{talk_url}/ocs/v2.php/apps/spreed/api/v4/room/{token}/participants"
+    response = requests.request("POST", url, headers=headers, data=payload, files=[])
+
+    if response.ok:
+        print(f"[Room] [talk] [{datetime.now()}] add {username} room({token}) ok")
+    else:
+        print(f"[Room] [talk] [{datetime.now()}] add {username} room({token}) error")

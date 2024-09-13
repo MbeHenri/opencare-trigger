@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 import requests
 from triggers.config import environ
 
@@ -40,13 +41,19 @@ def insert_user_to_talk(username, display):
             status = data["ocs"]["meta"]["statuscode"]
 
             if status != 102:
-                return True
+                print(
+                    f"[Room] [user] [{datetime.now()}] sync Identifier({username}) exist"
+                )
             else:
-                return False
+                print(
+                    f"[Room] [user] [{datetime.now()}] sync Identifier({username}) error"
+                )
         else:
-            return True
+            print(
+                f"[Room] [user] [{datetime.now()}] sync Identifier({username}) created"
+            )
     else:
-        return False
+        print(f"[Room] [user] [{datetime.now()}] sync Identifier({username}) error")
 
 
 def create_room(name):
@@ -73,6 +80,9 @@ def create_room(name):
     if response.status_code == 200:
         result = response.json()
         data = result["ocs"]["data"]
-        return f'{data["token"]}'
+        token = f'{data["token"]}'
+        print(f"[Room] [talk] [{datetime.now()}] create ({token}) ok")
+        return token
     else:
+        print(f"[Room] [talk] [{datetime.now()}] create ({token}) error")
         return None

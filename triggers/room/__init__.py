@@ -12,7 +12,7 @@ from triggers.room.utils import create_room, insert_user_to_talk
 
 
 def main():
-    print(f"[ROOM] [{datetime.now()}] init")
+    print(f"[Room] [{datetime.now()}] init")
     waiting_time = 100
 
     # loop of the server
@@ -38,38 +38,40 @@ def main():
             for doctor in doctors:
                 for patient in patients:
                     # creation du patient et du docteur dans talk
-                    ok = insert_user_to_talk(
+                    insert_user_to_talk(
                         doctor["identifier"], doctor["person"]["display"]
                     )
-                    ok = ok and insert_user_to_talk(
+                    insert_user_to_talk(
                         patient["patientIdentifier"]["identifier"],
                         patient["person"]["display"],
                     )
-                    # si les deux sont présent dans talk on verifie s'il n'existe pas de reunion enregistré dans mongo
-                    if ok:
-                        exist = collection.find_one(
-                            {
-                                "uuidDoctor": doctor["uuid"],
-                                "uuidPatient": patient["uuid"],
-                            }
+                    # on verifie s'il n'existe pas de reunion enregistré dans mongo
+                    exist = collection.find_one(
+                        {
+                            "uuidDoctor": doctor["uuid"],
+                            "uuidPatient": patient["uuid"],
+                        }
+                    )
+                    # si non on la crée dans talk et on la renseigne dans mongo
+                    if not exist:
+                        token = create_room(
+                            f"Consultation ({doctor['person']['display']} / {patient['person']['display']})"
                         )
-                        # si non on la crée dans talk et on la renseigne dans mongo
-                        if not exist:
-                            token = create_room(
-                                f"Consultation ({doctor['person']['display']} / {patient['person']['display']})"
+
+                        if token:
+                            collection.insert_one(
+                                {
+                                    "uuidPatient": patient["uuid"],
+                                    "uuidDoctor": doctor["uuid"],
+                                    "tokenRoom": token,
+                                }
+                            )
+                            print(
+                                f"[Room] [mongo] [{datetime.now()}] insert ({token}) error"
                             )
 
-                            if token:
-                                collection.insert_one(
-                                    {
-                                        "uuidPatient": patient["uuid"],
-                                        "uuidDoctor": doctor["uuid"],
-                                        "tokenRoom": token,
-                                    }
-                                )
-
         # client.close()
-        print(f"[ROOM] [{datetime.now()}] end synchronisation")
+        print(f"[Room] [{datetime.now()}] end synchronisation")
 
         # waiting
         time.sleep(waiting_time)

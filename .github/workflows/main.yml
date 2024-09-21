@@ -1,0 +1,29 @@
+name: Deploy Trigger to VM-Patient
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    
+    - name: Install rsync and sshpass
+      run: sudo apt-get update && sudo apt-get install rsync sshpass
+
+    - name: Deploy to VM-Patient
+      env:
+        HOST: ${{ secrets.VM_HOST }}
+        USER: ${{ secrets.VM_USER }}
+        PASS: ${{ secrets.VM_PWD }}
+      run: |
+        # Déploiement du Trigger
+        sshpass -p "$PASS" rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./build/ ${USER}@${HOST}:~/opencare-trigger/

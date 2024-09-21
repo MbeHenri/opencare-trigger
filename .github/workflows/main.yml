@@ -26,4 +26,4 @@ jobs:
         PASS: ${{ secrets.VM_PWD }}
       run: |
         # Déploiement du Trigger
-        sshpass -p "$PASS" rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./build/ ${USER}@${HOST}:~/opencare-trigger/
+        sshpass -p "$PASS" rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./ ${USER}@${HOST}:~/opencare-trigger/

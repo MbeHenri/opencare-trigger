@@ -19,10 +19,6 @@ environ = {
     "ODOO_PASSWORD": getenv("ODOO_API_KEY"),
     "ODOO_CODE_SERVICE": getenv("ODOO_CODE_SERVICE", "OPENCARES"),
     "ODOO_PRICE_SERVICE": getenv("ODOO_PRICE_SERVICE", 1500),
-    "TALK_URL": getenv("TALK_URL"),
-    "TALK_USER": getenv("TALK_USER"),
-    "TALK_PASSWORD": getenv("TALK_PASSWORD"),
-    "TALK_INIT_PASSWORD": getenv("TALK_INIT_PASSWORD", "TALK_PASSWORD"),
 }
 
 def get_mongodb_client():

@@ -6,7 +6,7 @@ from triggers.config import get_mongodb_client
 from triggers.doctor.utils import get_doctors
 from triggers.patient import combinaisons
 from triggers.patient.utils import get_patients
-from triggers.room.utils import create_room, insert_user_to_talk, add_user_room
+from triggers.room.utils import build_room_name
 
 
 def main():
@@ -35,14 +35,6 @@ def main():
 
             for doctor in doctors:
                 for patient in patients:
-                    # creation du patient et du docteur dans talk
-                    insert_user_to_talk(
-                        doctor["identifier"], doctor["person"]["display"]
-                    )
-                    insert_user_to_talk(
-                        patient["patientIdentifier"]["identifier"],
-                        patient["person"]["display"],
-                    )
                     # on verifie s'il n'existe pas de reunion enregistré dans mongo
                     exist = collection.find_one(
                         {
@@ -50,30 +42,27 @@ def main():
                             "uuidPatient": patient["uuid"],
                         }
                     )
-                    # si non on la crée dans talk et on la renseigne dans mongo
+                    # si non on construit le nom Jitsi et on le renseigne dans mongo
                     if exist is None:
-                        token = create_room(
-                            f"Consultation ({doctor['person']['display']} / {patient['person']['display']})"
+                        room_name = build_room_name(
+                            doctor["person"]["display"],
+                            patient["person"]["display"],
                         )
-
-                        if token is not None:
-                            add_user_room(
-                                token, patient["patientIdentifier"]["identifier"]
-                            )
-                            add_user_room(token, doctor["identifier"])
-                            collection.insert_one(
-                                {
-                                    "uuidPatient": patient["uuid"],
-                                    "uuidDoctor": doctor["uuid"],
-                                    "tokenRoom": token,
-                                }
-                            )
+                        collection.insert_one(
+                            {
+                                "uuidPatient": patient["uuid"],
+                                "uuidDoctor": doctor["uuid"],
+                                "roomName": room_name,
+                            }
+                        )
+                        print(
+                            f"[Room] [jitsi] [{datetime.now()}] created {room_name}"
+                        )
                     else:
                         print(
-                            f"[Room] [talk] [{datetime.now()}] create {exist['tokenRoom']} error"
+                            f"[Room] [jitsi] [{datetime.now()}] {exist['roomName']} already exists"
                         )
 
-        # client.close()
         print(f"[Room] [{datetime.now()}] end synchronisation")
 
         # waiting
